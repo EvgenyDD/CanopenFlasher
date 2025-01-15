@@ -151,11 +151,11 @@ static int parse_arg(char *argv[], int argc)
 {
 	if(argc != 5 && argc != 6)
 	{
-		fprintf(stderr, "Error! CANOPEN FLASHER [ver. %s]: Wrong argument count!\nUsage:\n    "
-						"  w/r     - write/read operation\n    "
-						"  p/b/a/c - fw select: preboot/boot/app/config\n    "
-						"  file    - firmware binary\n    "
-						"  id      - device CAN ID\n    "
+		fprintf(stderr, "Error! CANOPEN FLASHER [ver. %s]: Wrong argument count!\nUsage:\n"
+						"  w/r     - write/read operation\n"
+						"  p/b/a/c - fw select: preboot/boot/app/config\n"
+						"  file    - firmware binary\n"
+						"  id      - device CAN ID\n"
 						"  name    - device name (write)\n",
 				CANOPEN_FLASHER_VER);
 		return ERR_ARGC;
