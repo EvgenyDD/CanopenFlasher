@@ -27,6 +27,8 @@ CXXFLAGS += -fsingle-precision-constant
 CXXFLAGS += $(CXX_FULL_FLAGS)
 CXXFLAGS += -Werror
 
+EXT_LIBS += m
+
 ifneq (,$(findstring Windows,$(OS)))
 	EXT_LIBS += setupapi
 	TCHAIN = x86_64-w64-mingw32-
@@ -58,6 +60,9 @@ PPDEFS += CO_CONFIG_TRACE=0
 DBG_OPTS = -gdwarf-2 -ggdb -g
 
 include core.mk
+
+install: $(EXECUTABLE)
+	cp $(EXECUTABLE) /usr/local/bin/
 
 tests: $(EXECUTABLE)
 	@echo "======================================================="

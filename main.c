@@ -151,11 +151,11 @@ static int parse_arg(char *argv[], int argc)
 {
 	if(argc != 5 && argc != 6)
 	{
-		fprintf(stderr, "Error! CANOPEN FLASHER [ver. %s]: Wrong argument count!\nUsage:\n\t"
-						"  w/r     - write/read operation\n\t"
-						"  p/b/a/c - fw select: preboot/boot/app/config\n\t"
-						"  file    - firmware binary\n\t"
-						"  id      - device CAN ID\n\t"
+		fprintf(stderr, "Error! CANOPEN FLASHER [ver. %s]: Wrong argument count!\nUsage:\n    "
+						"  w/r     - write/read operation\n    "
+						"  p/b/a/c - fw select: preboot/boot/app/config\n    "
+						"  file    - firmware binary\n    "
+						"  id      - device CAN ID\n    "
 						"  name    - device name (write)\n",
 				CANOPEN_FLASHER_VER);
 		return ERR_ARGC;
@@ -216,7 +216,7 @@ static int read_sts_flash(CO_t *c, uint8_t id, const char *op)
 		}
 		delay_ms(100);
 	}
-	printf("error:\tread_sts_flash %s failed, status: x%x | SDO: x%X", op, flash_sts, err_code);
+	printf("error:    read_sts_flash %s failed, status: x%x | SDO: x%X", op, flash_sts, err_code);
 	return SDO_FL_ERR_STS_FL;
 }
 
@@ -250,7 +250,7 @@ static int dev_prepare(CO_t *c, uint8_t id, const char *tgt_name, const char *ot
 	str_to_upper((char *)str);
 	if(strcmp((char *)str, tgt_name) != 0 && strcmp((char *)str, oth_name) != 0)
 	{
-		printf("error:\tdevice (%s or %s) not found: %s\n", tgt_name, oth_name, str);
+		printf("error:    device (%s or %s) not found: %s\n", tgt_name, oth_name, str);
 		return SDO_FL_ERR_NOT_FOUND;
 	}
 	if(strcmp((char *)str, oth_name) == 0) // need reset
@@ -347,7 +347,7 @@ int main(int argc, char *argv[])
 	sp_list_t list = {0};
 
 	// while(sp_enumerate(&list))
-	// 	if(strstr(list.info.port, "ttyS") == NULL) printf("\t%s#%s#%s\n", list.info.port, list.info.description, list.info.hardware_id);
+	// 	if(strstr(list.info.port, "ttyS") == NULL) printf("    %s#%s#%s\n", list.info.port, list.info.description, list.info.hardware_id);
 
 	while(sp_enumerate(&list))
 		if(strstr(list.info.hardware_id, PORT_ID) != NULL)
@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
 		f = fopen(cfg.file_name, "rb");
 		if(!f)
 		{
-			fprintf(stderr, "error:\topen file %s\n", cfg.file_name);
+			fprintf(stderr, "error:    open file %s\n", cfg.file_name);
 			return ERR_FILE;
 		}
 
@@ -382,11 +382,11 @@ int main(int argc, char *argv[])
 		size_t read = fread(content, 1, content_length, f);
 		if(read != content_length)
 		{
-			fprintf(stderr, "error:\tread file (%zu %zu)\n", read, content_length);
+			fprintf(stderr, "error:    read file (%zu %zu)\n", read, content_length);
 			return ERR_FILE_READ;
 		}
 
-		fprintf(stderr, "info:\tflashing %s %s to \"%s\" (%zu bytes)...\n",
+		fprintf(stderr, "info:    flashing %s %s to \"%s\" (%zu bytes)...\n",
 				cfg.file_name, fw_type_str[cfg.sel], cfg.dev_name, content_length);
 
 		int errc = 1;
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 		sts = dev_prepare(co, cfg.id, cfg.dev_name, oth_name);
 		if(sts)
 		{
-			fprintf(stderr, "error:\tfailed to prepare: %s\n", SDO_FL_ERR2STR(sts));
+			fprintf(stderr, "error:    failed to prepare: %s\n", SDO_FL_ERR2STR(sts));
 			return ERR_DEV_INIT;
 		}
 
@@ -434,17 +434,17 @@ int main(int argc, char *argv[])
 				}
 
 				PERCENT_TRACKER_TRACK(tr, (double)off / (double)(content_length),
-									  { fprintf(stderr, "\rinfo:\t%.1f%% | pass: %lld sec | est: %lld sec        ",
+									  { fprintf(stderr, "\rinfo:    %.1f%% | pass: %lld sec | est: %lld sec        ",
 												100.0 * tr.progress, tr.time_ms_pass / 1000, tr.time_ms_est / 1000); });
 				fflush(stdout);
 			}
 			if(errc == 0)
 			{
-				fprintf(stderr, "\rinfo:\t100.0%% | pass: %.3f sec | speed: %.2f kB/s\t\t",
+				fprintf(stderr, "\rinfo:    100.0%% | pass: %.3f sec | speed: %.2f kB/s        ",
 						(double)tr.time_ms_pass * 0.001, (double)(content_length / (double)tr.time_ms_pass));
 				break;
 			}
-			if(retry != RETRY_CNT - 1) fprintf(stderr, "error:\ttrying again...\n");
+			if(retry != RETRY_CNT - 1) fprintf(stderr, "error:    trying again...\n");
 		}
 		fprintf(stderr, "\n");
 
@@ -453,11 +453,11 @@ int main(int argc, char *argv[])
 			sts = dev_check(co, cfg.id);
 			if(sts)
 			{
-				fprintf(stderr, "error:\tfailed to check HW\n");
+				fprintf(stderr, "error:    failed to check HW\n");
 				errc = ERR_CHK;
 			}
 		}
-		fprintf(stderr, errc ? "error:\tupdate failed\n" : "info:\tOK, exiting...\n");
+		fprintf(stderr, errc ? "error:    update failed\n" : "info:    OK, exiting...\n");
 
 		if(errc == 0) dev_reset(co, cfg.id);
 	}
@@ -466,17 +466,17 @@ int main(int argc, char *argv[])
 		f = fopen(cfg.file_name, "wb");
 		if(!f)
 		{
-			fprintf(stderr, "error:\topen file %s\n", cfg.file_name);
+			fprintf(stderr, "error:    open file %s\n", cfg.file_name);
 			return ERR_FILE;
 		}
-		fprintf(stderr, "info:\treading \"%s\" %s to %s...\n", cfg.dev_name, fw_type_str[cfg.sel], cfg.file_name);
+		fprintf(stderr, "info:    reading \"%s\" %s to %s...\n", cfg.dev_name, fw_type_str[cfg.sel], cfg.file_name);
 
 		uint32_t cmd = CO_SDO_FLASHER_W_STOP;
 		write_SDO(co->SDOclient, cfg.id, 0x1F51, 1, (uint8_t *)&cmd, sizeof(cmd), 3000);
 		if(!sts) sts = read_sts_flash(co, cfg.id, "CO_SDO_FLASHER_W_STOP");
 		if(sts)
 		{
-			fprintf(stderr, "error:\tfailed to setup device \"%s\"\n", cfg.dev_name);
+			fprintf(stderr, "error:    failed to setup device \"%s\"\n", cfg.dev_name);
 			return ERR_REBOOT;
 		};
 
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
 				sts = dev_read(co, cfg.id, cfg.sel, offset, pkt, &readed);
 				if(sts < 0)
 				{
-					fprintf(stderr, "\rerror:\tfailed to read (%d) @%d\n", sts, offset);
+					fprintf(stderr, "\rerror:    failed to read (%d) @%d\n", sts, offset);
 				}
 				else
 				{
@@ -523,12 +523,12 @@ int main(int argc, char *argv[])
 			size_t wr_cnt = fwrite(pkt, 1, (size_t)sts, f);
 			if(wr_cnt != (size_t)sts)
 			{
-				fprintf(stderr, "error:\tfailed to write to file %s\n", cfg.file_name);
+				fprintf(stderr, "error:    failed to write to file %s\n", cfg.file_name);
 				errc = 1;
 				break;
 			}
 		}
-		fprintf(stderr, errc ? "Error!\n" : "info:\tOK, exiting...\n");
+		fprintf(stderr, errc ? "Error!\n" : "info:    OK, exiting...\n");
 		return errc;
 	}
 }
