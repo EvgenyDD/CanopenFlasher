@@ -434,11 +434,16 @@ int main(int argc, char *argv[])
 				}
 
 				PERCENT_TRACKER_TRACK(tr, (double)off / (double)(content_length),
-									  { fprintf(stderr, "\rinfo:\t%.1f%% | pass: %lld sec | est: %lld sec\t\t",
+									  { fprintf(stderr, "\rinfo:\t%.1f%% | pass: %lld sec | est: %lld sec        ",
 												100.0 * tr.progress, tr.time_ms_pass / 1000, tr.time_ms_est / 1000); });
 				fflush(stdout);
 			}
-			if(errc == 0) break;
+			if(errc == 0)
+			{
+				fprintf(stderr, "\rinfo:\t100.0%% | pass: %.3f sec | speed: %.2f kB/s\t\t",
+						(double)tr.time_ms_pass * 0.001, (double)(content_length / (double)tr.time_ms_pass));
+				break;
+			}
 			if(retry != RETRY_CNT - 1) fprintf(stderr, "error:\ttrying again...\n");
 		}
 		fprintf(stderr, "\n");
@@ -477,6 +482,7 @@ int main(int argc, char *argv[])
 
 		int errc = 1;
 		uint8_t pkt[QUANT_FLASH];
+		PERCENT_TRACKER_INIT(tr);
 		for(uint32_t offset = 0, readed_length = 0;; offset += (uint32_t)sts)
 		{
 			errc = 1;
@@ -500,7 +506,11 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "\rreading... %d bytes", readed_length);
 			if(sts == 0) // done
 			{
-				fprintf(stderr, "\n");
+				struct timeval t1;
+				gettimeofday(&t1, NULL);
+				tr.time_ms_pass = (uint64_t)((t1.tv_sec - tr.t0.tv_sec) * 1000 + (t1.tv_usec - tr.t0.tv_usec) / 1000);
+				tr.time_ms_est = (uint64_t)((float)tr.time_ms_pass / tr.progress);
+				fprintf(stderr, " | pass: %.3f sec | speed: %.2f kB/s\n", (double)tr.time_ms_pass * 0.001, (double)(readed_length / (double)tr.time_ms_pass));
 				if(readed_length == 0) fprintf(stderr, "FW region is invalid (size is 0)\n");
 				errc == 0;
 				fclose(f);
