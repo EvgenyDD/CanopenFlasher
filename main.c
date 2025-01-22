@@ -305,7 +305,7 @@ static int dev_write(CO_t *c, uint8_t id, uint32_t addr, const uint8_t *data, ui
 	return 0;
 }
 
-static int dev_read(CO_t *c, uint8_t id, uint8_t fw_sel, uint32_t addr, uint8_t *data, uint32_t *size)
+static int dev_read(CO_t *c, uint8_t id, uint8_t fw_sel, uint32_t addr, uint8_t *data)
 {
 	block.block_number = fw_sel;
 	block.address = addr;
@@ -495,8 +495,7 @@ int main(int argc, char *argv[])
 			errc = 1;
 			for(uint32_t try = 0; try < 5; try++)
 			{
-				uint32_t readed = sizeof(pkt);
-				sts = dev_read(co, cfg.id, cfg.sel, offset, pkt, &readed);
+				sts = dev_read(co, cfg.id, cfg.sel, offset, pkt);
 				if(sts < 0)
 				{
 					fprintf(stderr, "\rerror:    failed to read (%d) @%d\n", sts, offset);
