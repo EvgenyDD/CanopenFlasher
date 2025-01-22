@@ -13,7 +13,7 @@
 
 #define PORT_ID "VID_F055&PID_1337"
 
-#define CANOPEN_FLASHER_VER "1.0.0"
+#define CANOPEN_FLASHER_VER "1.0.1"
 
 #define REBOOT_TO 400
 #define RETRY_CNT 5
@@ -149,6 +149,12 @@ static struct
 
 static int parse_arg(char *argv[], int argc)
 {
+	if(argc == 2)
+	{
+		int sts = parse_file_fw(argv[1]);
+		if(sts) parse_file_cfg(argv[1]);
+		return -1;
+	}
 	if(argc != 5 && argc != 6)
 	{
 		fprintf(stderr, "Error! CANOPEN FLASHER [ver. %s]: Wrong argument count!\nUsage:\n"
@@ -340,6 +346,7 @@ static int dev_check(CO_t *c, uint8_t id)
 int main(int argc, char *argv[])
 {
 	int sts = parse_arg(argv, argc);
+	if(sts < 0) return 0;
 	if(sts) return sts;
 
 	atexit(on_exit_cb);
